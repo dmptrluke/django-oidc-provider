@@ -17,5 +17,9 @@ class SessionManagementMiddleware(MiddlewareMixin):
 
     def process_response(self, request, response):
         if settings.get('OIDC_SESSION_MANAGEMENT_ENABLE'):
-            response.set_cookie('op_browser_state', get_browser_state_or_default(request))
+            response.set_cookie(
+                'op_browser_state',
+                get_browser_state_or_default(request),
+                secure=settings.get('OIDC_SESSION_MANAGEMENT_COOKIE_SECURE', None)
+            )
         return response

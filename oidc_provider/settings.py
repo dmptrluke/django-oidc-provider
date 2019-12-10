@@ -87,6 +87,13 @@ class DefaultSettings(object):
         return False
 
     @property
+    def OIDC_SESSION_MANAGEMENT_COOKIE_SECURE(self):
+        """
+        OPTIONAL. Whether the session management cookie should be secure (https:// only).
+        """
+        return False
+
+    @property
     def OIDC_UNAUTHENTICATED_SESSION_MANAGEMENT_KEY(self):
         """
         OPTIONAL. Supply a fixed string to use as browser-state key for unauthenticated clients.
