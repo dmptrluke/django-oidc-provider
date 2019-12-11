@@ -13,7 +13,6 @@ from uuid import uuid4
 
 from django.utils import timezone
 
-from oidc_provider.lib.claims import StandardScopeClaims
 from oidc_provider.lib.errors import (
     AuthorizeError,
     ClientIdError,
@@ -30,7 +29,7 @@ from oidc_provider.models import (
     UserConsent,
 )
 from oidc_provider import settings
-from oidc_provider.lib.utils.common import get_browser_state_or_default
+from oidc_provider.lib.utils.common import get_browser_state_or_default, get_scopes_information
 
 logger = logging.getLogger(__name__)
 
@@ -274,15 +273,5 @@ class AuthorizeEndpoint(object):
         """
         Return a list with the description of all the scopes requested.
         """
-        scopes = StandardScopeClaims.get_scopes_info(self.params['scope'])
-        if settings.get('OIDC_EXTRA_SCOPE_CLAIMS'):
-            scopes_extra = settings.get(
-                'OIDC_EXTRA_SCOPE_CLAIMS', import_str=True).get_scopes_info(self.params['scope'])
-            for index_extra, scope_extra in enumerate(scopes_extra):
-                for index, scope in enumerate(scopes[:]):
-                    if scope_extra['scope'] == scope['scope']:
-                        del scopes[index]
-        else:
-            scopes_extra = []
-
-        return scopes + scopes_extra
+        scopes = get_scopes_information(self.params['scope'])
+        return scopes

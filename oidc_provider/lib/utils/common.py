@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from django.utils.cache import patch_vary_headers
 
 from oidc_provider import settings
-
+from oidc_provider.lib.claims import StandardScopeClaims
 
 if django.VERSION >= (1, 11):
     from django.urls import reverse
@@ -184,3 +184,21 @@ def cors_allow_any(request, response):
         response['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
 
     return response
+
+
+def get_scopes_information(scopes):
+    """
+    Return a list with the description of all the scopes requested.
+    """
+    scopes = StandardScopeClaims.get_scopes_info(scopes)
+    if settings.get('OIDC_EXTRA_SCOPE_CLAIMS'):
+        scopes_extra = settings.get(
+            'OIDC_EXTRA_SCOPE_CLAIMS', import_str=True).get_scopes_info(scopes)
+        for index_extra, scope_extra in enumerate(scopes_extra):
+            for index, scope in enumerate(scopes[:]):
+                if scope_extra['scope'] == scope['scope']:
+                    del scopes[index]
+    else:
+        scopes_extra = []
+
+    return scopes + scopes_extra

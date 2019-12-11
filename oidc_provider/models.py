@@ -8,7 +8,7 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
-
+from oidc_provider.lib.utils.common import get_scopes_information
 
 CLIENT_TYPE_CHOICES = [
     ('confidential', 'Confidential'),
@@ -174,6 +174,10 @@ class BaseCodeTokenModel(models.Model):
     @scope.setter
     def scope(self, value):
         self._scope = ' '.join(value)
+
+    @property
+    def detailed_scopes(self):
+        return get_scopes_information(self.scope)
 
     def __unicode__(self):
         return self.__str__()

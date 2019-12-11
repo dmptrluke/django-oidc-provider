@@ -45,7 +45,7 @@ from oidc_provider.lib.utils.common import (
     get_site_url,
     get_issuer,
     cors_allow_any,
-)
+    get_scopes_information)
 from oidc_provider.lib.utils.oauth2 import protected_resource_view
 from oidc_provider.lib.utils.token import client_id_from_id_token
 from oidc_provider.models import (
@@ -139,7 +139,7 @@ class AuthorizeView(View):
                     'client': authorize.client,
                     'hidden_inputs': hidden_inputs,
                     'params': authorize.params,
-                    'scopes': authorize.get_scopes_information(),
+                    'scopes': get_scopes_information(authorize.params['scope']),
                 }
 
                 return render(request, OIDC_TEMPLATES['authorize'], context)
