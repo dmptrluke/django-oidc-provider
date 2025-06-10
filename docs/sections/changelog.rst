@@ -8,7 +8,7 @@ All notable changes to this project will be documented in this file.
 Unreleased
 ==========
 
-Nothing yet.
+* Added: Translation to Russian.
 
 0.8.4
 =====
