@@ -9,6 +9,7 @@ Unreleased
 ==========
 
 * Added: Translation to Russian.
+* Changed: Ruff as a fast Python linter and code formatter.
 
 0.8.4
 =====
