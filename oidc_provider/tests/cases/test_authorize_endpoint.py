@@ -583,6 +583,26 @@ class AuthorizationCodeFlowTestCase(TestCase, AuthorizeEndpointMixin):
         self.assertIn("none", strip_prompt_login(path3))
         self.assertNotIn("login", strip_prompt_login(path3))
 
+    def test_client_id_with_null_char_are_rejected(self):
+        """
+        Test that client_id parameters containing unexpected characters and
+        are properly sanitized and to not cause database errors.
+        """
+        data = {
+            "client_id": "Hello\0World",
+            "response_type": next(self.client_code.response_type_values()),
+            "redirect_uri": self.client_code.default_redirect_uri,
+            "scope": "openid email",
+            "state": self.state,
+            "prompt": "none",
+        }
+
+        response = self._auth_request("get", data)
+
+        self.assertEqual(response.status_code, 200)
+
+        self.assertIn("Client ID Error", response.content.decode("utf-8"))
+
 
 class AuthorizationImplicitFlowTestCase(TestCase, AuthorizeEndpointMixin):
     """

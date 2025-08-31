@@ -28,6 +28,7 @@ from oidc_provider.lib.errors import AuthorizeError
 from oidc_provider.lib.errors import ClientIdError
 from oidc_provider.lib.errors import RedirectUriError
 from oidc_provider.lib.utils.common import get_browser_state_or_default
+from oidc_provider.lib.utils.sanitization import sanitize_client_id
 from oidc_provider.lib.utils.token import create_code
 from oidc_provider.lib.utils.token import create_id_token
 from oidc_provider.lib.utils.token import create_token
@@ -72,7 +73,10 @@ class AuthorizeEndpoint(object):
         # and POST request.
         query_dict = self.request.POST if self.request.method == "POST" else self.request.GET
 
-        self.params["client_id"] = query_dict.get("client_id", "")
+        # Sanitize client_id to remove control characters that cause PostgreSQL errors
+        client_id = query_dict.get("client_id", "")
+        self.params["client_id"] = sanitize_client_id(client_id)
+
         self.params["redirect_uri"] = query_dict.get("redirect_uri", "")
         self.params["response_type"] = query_dict.get("response_type", "")
         self.params["scope"] = query_dict.get("scope", "").split()

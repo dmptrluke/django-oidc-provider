@@ -11,6 +11,7 @@ from oidc_provider import settings
 from oidc_provider.lib.errors import TokenError
 from oidc_provider.lib.errors import UserAuthError
 from oidc_provider.lib.utils.oauth2 import extract_client_auth
+from oidc_provider.lib.utils.sanitization import sanitize_client_id
 from oidc_provider.lib.utils.token import create_id_token
 from oidc_provider.lib.utils.token import create_token
 from oidc_provider.lib.utils.token import encode_id_token
@@ -31,7 +32,8 @@ class TokenEndpoint(object):
     def _extract_params(self):
         client_id, client_secret = extract_client_auth(self.request)
 
-        self.params["client_id"] = client_id
+        # Sanitize client_id to remove control characters that cause PostgreSQL errors
+        self.params["client_id"] = sanitize_client_id(client_id)
         self.params["client_secret"] = client_secret
         self.params["redirect_uri"] = self.request.POST.get("redirect_uri", "")
         self.params["grant_type"] = self.request.POST.get("grant_type", "")

@@ -10,6 +10,7 @@ Unreleased
 
 * Added: Translation to Russian.
 * Changed: Ruff as a fast Python linter and code formatter.
+* Fixed: client_id sanitization to prevent database errors.
 
 0.8.4
 =====
