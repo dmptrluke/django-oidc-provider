@@ -73,10 +73,7 @@ class AuthorizeEndpoint(object):
         # and POST request.
         query_dict = self.request.POST if self.request.method == "POST" else self.request.GET
 
-        # Sanitize client_id to remove control characters that cause PostgreSQL errors
-        client_id = query_dict.get("client_id", "")
-        self.params["client_id"] = sanitize_client_id(client_id)
-
+        self.params["client_id"] = sanitize_client_id(query_dict.get("client_id", ""))
         self.params["redirect_uri"] = query_dict.get("redirect_uri", "")
         self.params["response_type"] = query_dict.get("response_type", "")
         self.params["scope"] = query_dict.get("scope", "").split()

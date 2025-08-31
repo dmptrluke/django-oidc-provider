@@ -32,7 +32,6 @@ class TokenEndpoint(object):
     def _extract_params(self):
         client_id, client_secret = extract_client_auth(self.request)
 
-        # Sanitize client_id to remove control characters that cause PostgreSQL errors
         self.params["client_id"] = sanitize_client_id(client_id)
         self.params["client_secret"] = client_secret
         self.params["redirect_uri"] = self.request.POST.get("redirect_uri", "")
