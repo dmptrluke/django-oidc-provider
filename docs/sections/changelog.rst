@@ -8,6 +8,11 @@ All notable changes to this project will be documented in this file.
 Unreleased
 ==========
 
+0.9.0
+=====
+
+*2025-09-23*
+
 * Changed: Use PyJWT+cryptography instead of jwkest+Cryptodrome.
 * Added: Translation to Russian.
 * Changed: Ruff as a fast Python linter and code formatter.
