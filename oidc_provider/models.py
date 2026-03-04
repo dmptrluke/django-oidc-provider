@@ -197,6 +197,12 @@ class BaseCodeTokenModel(models.Model):
     def __unicode__(self):
         return self.__str__()
 
+    @property
+    def detailed_scopes(self):
+        from oidc_provider.lib.utils.common import get_scopes_information
+
+        return get_scopes_information(self.scope)
+
     def has_expired(self):
         return timezone.now() >= self.expires_at
 

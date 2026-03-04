@@ -337,16 +337,6 @@ class AuthorizeEndpoint(object):
         """
         Return a list with the description of all the scopes requested.
         """
-        scopes = StandardScopeClaims.get_scopes_info(self.params["scope"])
-        if settings.get("OIDC_EXTRA_SCOPE_CLAIMS"):
-            scopes_extra = settings.get("OIDC_EXTRA_SCOPE_CLAIMS", import_str=True).get_scopes_info(
-                self.params["scope"]
-            )
-            for index_extra, scope_extra in enumerate(scopes_extra):
-                for index, scope in enumerate(scopes[:]):
-                    if scope_extra["scope"] == scope["scope"]:
-                        del scopes[index]
-        else:
-            scopes_extra = []
+        from oidc_provider.lib.utils.common import get_scopes_information
 
-        return scopes + scopes_extra
+        return get_scopes_information(self.params["scope"])

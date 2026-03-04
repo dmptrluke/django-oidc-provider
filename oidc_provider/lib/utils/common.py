@@ -159,6 +159,27 @@ def run_processing_hook(subject, hook_settings_name, **kwargs):
     return subject
 
 
+def get_scopes_information(scopes):
+    """
+    Return a list with the description of all the scopes requested.
+    """
+    from oidc_provider.lib.claims import StandardScopeClaims
+
+    scopes_info = StandardScopeClaims.get_scopes_info(scopes)
+    if settings.get("OIDC_EXTRA_SCOPE_CLAIMS"):
+        scopes_extra = settings.get(
+            "OIDC_EXTRA_SCOPE_CLAIMS", import_str=True
+        ).get_scopes_info(scopes)
+        for index_extra, scope_extra in enumerate(scopes_extra):
+            for index, scope in enumerate(scopes_info[:]):
+                if scope_extra["scope"] == scope["scope"]:
+                    del scopes_info[index]
+    else:
+        scopes_extra = []
+
+    return scopes_info + scopes_extra
+
+
 def cors_allow_any(request, response):
     """
     Add headers to permit CORS requests from any origin, with or without credentials,
