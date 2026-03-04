@@ -98,6 +98,8 @@ class ClientAdmin(admin.ModelAdmin):
 
 @admin.register(Code)
 class CodeAdmin(admin.ModelAdmin):
+    list_display = ["code", "client", "user", "is_authentication"]
+    list_filter = ["client"]
     raw_id_fields = ["user"]
 
     def has_add_permission(self, request):
@@ -106,6 +108,8 @@ class CodeAdmin(admin.ModelAdmin):
 
 @admin.register(Token)
 class TokenAdmin(admin.ModelAdmin):
+    list_display = ["access_token", "client", "user"]
+    list_filter = ["client"]
     raw_id_fields = ["user"]
 
     def has_add_permission(self, request):
