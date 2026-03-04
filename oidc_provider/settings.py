@@ -187,6 +187,14 @@ class DefaultSettings(object):
         """
         return False
 
+    @property
+    def OIDC_CLAIMS_SUPPORTED(self):
+        """
+        RECOMMENDED. A list of Claims names that you may support.
+        https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderMetadata
+        """
+        return []
+
 
 default_settings = DefaultSettings()
 

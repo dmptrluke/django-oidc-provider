@@ -311,6 +311,8 @@ class ProviderInfoView(View):
 
         dic["request_parameter_supported"] = False
 
+        dic["claims_supported"] = settings.get("OIDC_CLAIMS_SUPPORTED", [])
+
         if settings.get("OIDC_SESSION_MANAGEMENT_ENABLE"):
             dic["check_session_iframe"] = site_url + reverse("oidc_provider:check-session-iframe")
 
