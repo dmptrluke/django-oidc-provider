@@ -1,7 +1,6 @@
 import base64
 import binascii
 import json
-from hashlib import md5
 from hashlib import sha256
 
 from django.conf import settings
@@ -289,4 +288,4 @@ class RSAKey(models.Model):
 
     @property
     def kid(self):
-        return "{0}".format(md5(self.key.encode("utf-8")).hexdigest() if self.key else "")
+        return "{0}".format(sha256(self.key.encode("utf-8")).hexdigest()[:16] if self.key else "")

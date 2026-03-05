@@ -1,5 +1,5 @@
-from hashlib import sha224
-from random import randint
+import secrets
+from hashlib import sha256
 from uuid import uuid4
 
 from django.contrib import admin
@@ -32,8 +32,7 @@ class ClientForm(ModelForm):
             # Sanitize existing client_id to remove any problematic characters
             return sanitize_client_id(instance.client_id)
         else:
-            # Generate new client_id (digits only)
-            return str(randint(1, 999999)).zfill(6)
+            return secrets.token_hex(16)
 
     def clean_client_secret(self):
         instance = getattr(self, "instance", None)
@@ -42,12 +41,12 @@ class ClientForm(ModelForm):
 
         if instance and instance.pk:
             if (self.cleaned_data["client_type"] == "confidential") and not instance.client_secret:
-                secret = sha224(uuid4().hex.encode()).hexdigest()
+                secret = sha256(uuid4().hex.encode()).hexdigest()
             elif (self.cleaned_data["client_type"] == "confidential") and instance.client_secret:
                 secret = instance.client_secret
         else:
             if self.cleaned_data["client_type"] == "confidential":
-                secret = sha224(uuid4().hex.encode()).hexdigest()
+                secret = sha256(uuid4().hex.encode()).hexdigest()
 
         return secret
 

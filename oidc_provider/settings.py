@@ -105,7 +105,7 @@ class DefaultSettings(object):
         """
         OPTIONAL. Whether the session management cookie should be secure (https:// only).
         """
-        return False
+        return True
 
     @property
     def OIDC_UNAUTHENTICATED_SESSION_MANAGEMENT_KEY(self):

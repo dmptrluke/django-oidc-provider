@@ -895,7 +895,7 @@ class TestCreateResponseURI(TestCase):
             authorization_endpoint.create_response_uri()
 
         log_exception.assert_called_once_with(
-            "[Authorize] Error when trying to create response uri: %s", exception
+            "[Authorize] Unexpected error when creating response uri: %s", exception
         )
 
     @override_settings(OIDC_SESSION_MANAGEMENT_ENABLE=True)

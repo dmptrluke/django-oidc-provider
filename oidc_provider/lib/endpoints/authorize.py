@@ -1,7 +1,7 @@
 import logging
+import secrets
 from datetime import datetime
 from datetime import timedelta
-from hashlib import md5
 from hashlib import sha256
 
 from oidc_provider.compat import get_attr_or_callable
@@ -17,8 +17,8 @@ except ImportError:
     from urllib.parse import urlencode
     from urllib.parse import urlsplit
     from urllib.parse import urlunsplit
-from uuid import uuid4
 
+from django.db import DatabaseError
 from django.utils import dateformat
 from django.utils import timezone
 
@@ -236,7 +236,7 @@ class AuthorizeEndpoint(object):
                 )
 
                 # Create random salt.
-                salt = md5(uuid4().hex.encode()).hexdigest()
+                salt = secrets.token_hex(32)
 
                 # The generation of suitable Session State values is based
                 # on a salted cryptographic hash of Client ID, origin URL,
@@ -254,8 +254,11 @@ class AuthorizeEndpoint(object):
                 elif self.grant_type in ["implicit", "hybrid"]:
                     query_fragment["session_state"] = session_state
 
+        except DatabaseError as error:
+            logger.exception("[Authorize] Database error when creating response uri: %s", error)
+            raise AuthorizeError(self.params["redirect_uri"], "server_error", self.grant_type)
         except Exception as error:
-            logger.exception("[Authorize] Error when trying to create response uri: %s", error)
+            logger.exception("[Authorize] Unexpected error when creating response uri: %s", error)
             raise AuthorizeError(self.params["redirect_uri"], "server_error", self.grant_type)
 
         uri = uri._replace(

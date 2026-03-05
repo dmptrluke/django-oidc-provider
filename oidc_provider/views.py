@@ -56,6 +56,7 @@ from oidc_provider.lib.utils.common import get_site_url
 from oidc_provider.lib.utils.common import redirect
 from oidc_provider.lib.utils.oauth2 import protected_resource_view
 from oidc_provider.lib.utils.token import client_id_from_id_token
+from oidc_provider.lib.utils.token import decode_id_token
 from oidc_provider.models import Client
 from oidc_provider.models import ResponseType
 from oidc_provider.models import RSAKey
@@ -409,6 +410,14 @@ class EndSessionView(View):
             client_id = client_id_from_id_token(self.id_token_hint)
             try:
                 self.client = Client.objects.get(client_id=client_id)
+
+                # Verify the id_token_hint signature now that we have the client and its keys.
+                try:
+                    decode_id_token(self.id_token_hint, self.client)
+                except Exception:
+                    logger.warning("[EndSession] id_token_hint signature verification failed")
+                    self.client = None
+                    return super().dispatch(request, *args, **kwargs)
 
                 if self.post_logout_redirect_uri:
                     if self.post_logout_redirect_uri not in self.client.post_logout_redirect_uris:

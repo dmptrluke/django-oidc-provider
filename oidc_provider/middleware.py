@@ -20,6 +20,8 @@ class SessionManagementMiddleware(MiddlewareMixin):
             response.set_cookie(
                 "op_browser_state",
                 get_browser_state_or_default(request),
-                secure=settings.get("OIDC_SESSION_MANAGEMENT_COOKIE_SECURE", None),
+                secure=settings.get("OIDC_SESSION_MANAGEMENT_COOKIE_SECURE"),
+                httponly=True,
+                samesite="Lax",
             )
         return response

@@ -89,8 +89,11 @@ def encode_id_token(payload, client):
 
 def decode_id_token(token, client):
     """
-    Represent the ID Token as a JSON Web Token (JWT).
-    Returns a dict.
+    Decode and verify an ID Token JWT.
+    Validates the signature, audience, and expiration claims.
+    The issued-at (iat) check is intentionally disabled to accommodate clock skew
+    and scenarios where tokens are created with frozen time.
+    Returns the decoded payload as a dict.
     """
     # Try decoding with each available key
     for key in get_client_alg_keys(client):
@@ -100,12 +103,9 @@ def decode_id_token(token, client):
                 # HS256 uses the same key for signing and verifying
                 key=key["key"] if key["algorithm"] == "HS256" else key["public_key"],
                 algorithms=[key["algorithm"]],
+                audience=client.client_id,
                 options={
-                    "verify_signature": True,
-                    "verify_aud": False,  # Disable audience validation for compatibility
-                    "verify_exp": False,  # Disable expiration validation for compatibility
-                    "verify_iat": False,  # Disable issued at validation for compatibility
-                    "verify_nbf": False,  # Disable not before validation for compatibility
+                    "verify_iat": False,  # Disabled: iat is informational and may be skewed by time-mocking
                 },
             )
         except jwt.InvalidTokenError:
@@ -117,11 +117,14 @@ def decode_id_token(token, client):
 
 def client_id_from_id_token(id_token):
     """
-    Extracts the client id from a JSON Web Token (JWT).
-    Does NOT verify the token signature or expiration.
-    Returns a string or None.
+    Extracts the client_id (audience) from an ID Token JWT without verifying the signature.
+
+    This is intentionally unverified because we need the client_id in order to look up
+    the client and its keys before we can verify the signature. Callers MUST perform a
+    full signature verification with decode_id_token() once the client is known.
+
+    Returns the client_id string, or None if the token has no audience claim.
     """
-    # Decode without verification to get the payload
     payload = jwt.decode(id_token, options={"verify_signature": False})
     aud = payload.get("aud", None)
     if aud is None:
